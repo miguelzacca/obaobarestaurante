@@ -737,6 +737,7 @@ body::before {
 
 .hero-badge {
   display: inline-flex;
+  opacity: 0 !important;
   align-items: center;
   gap: 0.6rem;
   padding: 0.55rem 1.4rem;
@@ -749,7 +750,8 @@ body::before {
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--gold-light);
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
+  /* Reduced from 2.5rem */
   box-shadow: 0 0 30px rgba(201, 168, 76, 0.12);
 }
 
@@ -765,7 +767,8 @@ body::before {
   line-height: 1.02;
   letter-spacing: -0.03em;
   color: var(--clr-text);
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
+  /* Reduced from 2rem */
 }
 
 .hero-title .line {
@@ -794,7 +797,8 @@ body::before {
   font-weight: 300;
   font-style: italic;
   color: rgba(240, 238, 232, 0.65);
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+  /* Reduced from 3rem */
   line-height: 1.6;
 }
 
