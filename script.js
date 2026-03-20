@@ -372,7 +372,7 @@ gsap.from('.carousel-3d-header > *', {
 });
 
 // ─────────────────────────────────────────────────────────────
-// CUSTOM 3D DRUM CAROUSEL ENGINE  (v2 — fixed)
+// CUSTOM 3D DRUM CAROUSEL ENGINE  (v3 — perfect snap)
 // ─────────────────────────────────────────────────────────────
 (function initDrumCarousel() {
   const ring     = document.getElementById('c3d-ring');
@@ -393,24 +393,18 @@ gsap.from('.carousel-3d-header > *', {
     return window.innerWidth <= 768 ? 240 : 360;
   }
 
-  // ── Source-of-truth rotation (degrees) ──────────────────────
-  // We ALWAYS read/write through this, never stale
-  let rotDeg  = 0;          // live rotation of ring
   let current = 0;          // active card index
 
   // ── Position cards statically on cylinder ───────────────────
   function layoutCards() {
     const radius = getRadius();
     cards.forEach((card, i) => {
-      // We MUST use a raw string here because GSAP's default
-      // transform order is translate -> rotate, which ruins the cylinder.
-      // By using a string, CSS applies rotateY FIRST, then translates Z along that new angle.
+      // Raw CSS transform guarantees correct translation order
       card.style.transform = `rotateY(${i * ANGLE}deg) translateZ(${radius}px)`;
     });
   }
   layoutCards();
 
-  // Re-layout on resize
   window.addEventListener('resize', () => layoutCards());
 
   // ── Build dots ──────────────────────────────────────────────
@@ -436,31 +430,36 @@ gsap.from('.carousel-3d-header > *', {
   }
   setActive(0);
 
-  // ── Go to card (GSAP animate ring) ──────────────────────────
+  // ── Go to card (GSAP ring rotation) ─────────────────────────
   function goTo(idx) {
-    idx = ((idx % COUNT) + COUNT) % COUNT;
+    // Normalize target index
+    const targetIdx = ((idx % COUNT) + COUNT) % COUNT;
 
-    // Shortest-path delta
-    let delta = idx - current;
-    if (delta >  COUNT / 2) delta -= COUNT;
-    if (delta < -COUNT / 2) delta += COUNT;
-
-    const targetDeg = rotDeg - delta * ANGLE;
+    const currentRot = gsap.getProperty(ring, 'rotateY') || 0;
+    
+    // Mathematical exact rotation for target index
+    const baseTarget = -targetIdx * ANGLE;
+    
+    // Shortest path difference
+    let diff = (baseTarget - currentRot) % 360;
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    
+    const targetDeg = currentRot + diff;
 
     gsap.killTweensOf(ring);
     gsap.to(ring, {
       rotateY: targetDeg,
-      duration: 0.95,
+      duration: 0.85,
       ease: 'power3.out',
       force3D: true,
       onUpdate() {
-        rotDeg = gsap.getProperty(ring, 'rotateY');
-        const liveIdx = Math.round(-rotDeg / ANGLE);
-        setActive(((liveIdx % COUNT) + COUNT) % COUNT);
+        const liveRot = gsap.getProperty(ring, 'rotateY') || 0;
+        const liveIdx = Math.round(-liveRot / ANGLE);
+        setActive(liveIdx);
       },
       onComplete() {
-        rotDeg = targetDeg;
-        setActive(idx);
+        setActive(targetIdx);
       },
     });
   }
@@ -484,7 +483,7 @@ gsap.from('.carousel-3d-header > *', {
 
   function dragStart(x) {
     dragStartX   = x;
-    dragStartRot = gsap.getProperty(ring, 'rotateY'); // read live value
+    dragStartRot = gsap.getProperty(ring, 'rotateY') || 0;
     gsap.killTweensOf(ring);
   }
 
@@ -492,10 +491,11 @@ gsap.from('.carousel-3d-header > *', {
     if (dragStartX === null) return;
     const dx     = x - dragStartX;
     const newRot = dragStartRot + dx * 0.28;
-    rotDeg       = newRot;
+    
     gsap.set(ring, { rotateY: newRot, force3D: true });
+    
     const liveIdx = Math.round(-newRot / ANGLE);
-    setActive(((liveIdx % COUNT) + COUNT) % COUNT);
+    setActive(liveIdx);
   }
 
   function dragEnd(x) {
@@ -503,39 +503,35 @@ gsap.from('.carousel-3d-header > *', {
     const dx = x - dragStartX;
     dragStartX = null;
 
-    // Snap to nearest card with a little inertia
-    const inertiaRot = rotDeg + dx * 0.15;
-    const snapIdx    = -Math.round(inertiaRot / ANGLE);
-    const normIdx    = ((snapIdx % COUNT) + COUNT) % COUNT;
+    const currentRot = gsap.getProperty(ring, 'rotateY') || 0;
+    
+    // Calculate nearest slot
+    let snapIdx = -Math.round(currentRot / ANGLE);
+    
+    // Directional throwing (prevent rubber-banding backward if swipe > 40px)
+    if (dx > 40) snapIdx = -Math.round((currentRot + ANGLE * 0.4) / ANGLE);
+    if (dx < -40) snapIdx = -Math.round((currentRot - ANGLE * 0.4) / ANGLE);
 
-    // Animate to snap position
-    const snapDeg = -snapIdx * ANGLE;
-    gsap.killTweensOf(ring);
-    gsap.to(ring, {
-      rotateY: snapDeg,
-      duration: 0.7,
-      ease: 'power3.out',
-      force3D: true,
-      onComplete() {
-        rotDeg = snapDeg;
-        setActive(normIdx);
-      },
-    });
+    // Let goTo handle shortest-path exact snap
+    goTo(snapIdx);
   }
 
   // Mouse events
   stage.addEventListener('mousedown',  (e) => { e.preventDefault(); dragStart(e.clientX); });
   window.addEventListener('mousemove', (e) => dragMove(e.clientX));
   window.addEventListener('mouseup',   (e) => dragEnd(e.clientX));
+  window.addEventListener('mouseleave', (e) => {
+    if (dragStartX !== null) dragEnd(e.clientX);
+  });
 
-  // Touch events — passive:false so we can prevent scroll while swiping carousel
+  // Touch events
   stage.addEventListener('touchstart', (e) => {
     dragStart(e.touches[0].clientX);
   }, { passive: true });
 
   stage.addEventListener('touchmove', (e) => {
     if (dragStartX === null) return;
-    e.stopPropagation();       // stop lenis from stealing it
+    e.stopPropagation(); // prevent lenis scroll conflict
     dragMove(e.touches[0].clientX);
   }, { passive: true });
 
@@ -563,7 +559,7 @@ gsap.from('.carousel-3d-header > *', {
   stage.addEventListener('touchstart',  stopAuto, { passive: true });
   stage.addEventListener('touchend',    () => setTimeout(startAuto, 2000), { passive: true });
 
-  // ── Scroll-triggered reveal (opacity only — preserve-3d safe) ──
+  // ── Scroll-triggered reveal ──────────────────────────────────
   gsap.fromTo(stage,
     { opacity: 0 },
     {
