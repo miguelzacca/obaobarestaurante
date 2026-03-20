@@ -321,6 +321,7 @@ gsap.from('.about .section-desc', {
 gsap.from('.info-item', {
   x: -40, opacity: 0, duration: 0.8, ease: 'power3.out',
   stagger: 0.15,
+  clearProps: 'all',
   scrollTrigger: { trigger: '.info-list', start: 'top 80%' },
 });
 
@@ -477,75 +478,13 @@ gsap.from('.carousel-3d-header > *', {
     if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
   });
 
-  // ── Drag / swipe ─────────────────────────────────────────────
-  let dragStartX  = null;
-  let dragStartRot = 0;
-
-  function dragStart(x) {
-    dragStartX   = x;
-    dragStartRot = gsap.getProperty(ring, 'rotateY') || 0;
-    gsap.killTweensOf(ring);
-  }
-
-  function dragMove(x) {
-    if (dragStartX === null) return;
-    const dx     = x - dragStartX;
-    const newRot = dragStartRot + dx * 0.28;
-    
-    gsap.set(ring, { rotateY: newRot, force3D: true });
-    
-    const liveIdx = Math.round(-newRot / ANGLE);
-    setActive(liveIdx);
-  }
-
-  function dragEnd(x) {
-    if (dragStartX === null) return;
-    const dx = x - dragStartX;
-    dragStartX = null;
-
-    const currentRot = gsap.getProperty(ring, 'rotateY') || 0;
-    
-    // Calculate nearest slot
-    let snapIdx = -Math.round(currentRot / ANGLE);
-    
-    // Directional throwing (prevent rubber-banding backward if swipe > 40px)
-    if (dx > 40) snapIdx = -Math.round((currentRot + ANGLE * 0.4) / ANGLE);
-    if (dx < -40) snapIdx = -Math.round((currentRot - ANGLE * 0.4) / ANGLE);
-
-    // Let goTo handle shortest-path exact snap
-    goTo(snapIdx);
-  }
-
-  // Mouse events
-  stage.addEventListener('mousedown',  (e) => { e.preventDefault(); dragStart(e.clientX); });
-  window.addEventListener('mousemove', (e) => dragMove(e.clientX));
-  window.addEventListener('mouseup',   (e) => dragEnd(e.clientX));
-  window.addEventListener('mouseleave', (e) => {
-    if (dragStartX !== null) dragEnd(e.clientX);
-  });
-
-  // Touch events
-  stage.addEventListener('touchstart', (e) => {
-    dragStart(e.touches[0].clientX);
-  }, { passive: true });
-
-  stage.addEventListener('touchmove', (e) => {
-    if (dragStartX === null) return;
-    e.stopPropagation(); // prevent lenis scroll conflict
-    dragMove(e.touches[0].clientX);
-  }, { passive: true });
-
-  stage.addEventListener('touchend', (e) => {
-    dragEnd(e.changedTouches[0].clientX);
-  }, { passive: true });
-
   // ── Autoplay ─────────────────────────────────────────────────
   let autoTimer = null;
 
   function startAuto() {
     stopAuto();
     autoTimer = setInterval(() => {
-      if (!document.hidden && dragStartX === null) goTo(current + 1);
+      if (!document.hidden) goTo(current + 1);
     }, 4200);
   }
 
@@ -572,11 +511,6 @@ gsap.from('.carousel-3d-header > *', {
 
   gsap.from('.carousel-3d-nav', {
     y: 30, opacity: 0, duration: 0.9, ease: 'power3.out',
-    scrollTrigger: { trigger: '.carousel-3d-section', start: 'top 76%' },
-  });
-
-  gsap.from('.carousel-drag-hint', {
-    y: 10, opacity: 0, duration: 0.7, ease: 'power2.out', delay: 0.3,
     scrollTrigger: { trigger: '.carousel-3d-section', start: 'top 76%' },
   });
 })();
