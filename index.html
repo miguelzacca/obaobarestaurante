@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Oba Oba Restaurante — Frutos do mar, drinks artesanais e experiências inesquecíveis à beira-mar em Itapema, SC.">
+  <link rel="icon" href="assets/logo.jpg" type="image/jpg">
+  <title>Oba Oba Restaurante | Itapema</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Poppins:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap"
+    rel="stylesheet">
+
+  <!-- Swiper CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- Aurora Background -->
+  <div class="aurora-wrap" aria-hidden="true">
+    <div class="aurora-orb"></div>
+    <div class="aurora-orb"></div>
+    <div class="aurora-orb"></div>
+  </div>
+
+  <!-- Floating particles canvas -->
+  <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <div class="loader-panels" aria-hidden="true">
+      <div class="loader-panel"></div>
+      <div class="loader-panel"></div>
+      <div class="loader-panel"></div>
+      <div class="loader-panel"></div>
+    </div>
+    <div class="loader-content">
+      <div class="loader-logo-wrap">
+        <svg class="loader-logo-ring" viewBox="0 0 146 146" fill="none" xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true">
+          <circle cx="73" cy="73" r="71" stroke="url(#gold-dash)" stroke-width="1.5" stroke-dasharray="6 4" />
+          <defs>
+            <linearGradient id="gold-dash" x1="0" y1="0" x2="146" y2="146" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#C9A84C" />
+              <stop offset="1" stop-color="#E2C27D" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <img src="assets/logo.jpg" alt="Oba Oba Logo" class="loader-logo">
+      </div>
+      <p class="loader-name">Oba Oba</p>
+      <p class="loader-tagline">Restaurante · Itapema · SC</p>
+      <p class="loader-counter" id="loader-counter">0%</p>
+    </div>
+    <div class="loader-progress" id="loader-progress"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <div class="header-container">
+      <div class="logo-wrap" data-magnetic>
+        <svg class="logo-ring-svg" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true">
+          <circle cx="39" cy="39" r="37" stroke="url(#logo-ring-g)" stroke-width="1" stroke-dasharray="4 3" />
+          <defs>
+            <linearGradient id="logo-ring-g" x1="0" y1="0" x2="78" y2="78" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#C9A84C" stop-opacity="0.8" />
+              <stop offset="1" stop-color="#E2C27D" stop-opacity="0.4" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <img src="assets/logo.jpg" alt="Oba Oba" class="logo">
+      </div>
+
+      <nav class="nav" aria-label="Navegação principal">
+        <a href="#experiencia" class="nav-link">A Experiência</a>
+        <a href="#gastronomia" class="nav-link">Gastronomia</a>
+        <a href="#destaques" class="nav-link">Destaques</a>
+      </nav>
+
+      <a href="https://linktr.ee/obaobarestauranteitapema" target="_blank" rel="noopener" class="btn-primary header-btn"
+        data-magnetic>
+        Reservar Mesa
+      </a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+      <div class="hero-bg">
+        <img src="assets/ambiente1.jpg" alt="Ambiente Oba Oba Restaurante" class="hero-img">
+        <div class="hero-overlay"></div>
+        <div class="hero-tint"></div>
+        <div class="hero-vignette"></div>
+      </div>
+
+      <!-- Morphing shapes -->
+      <div class="hero-shape hero-shape-1" aria-hidden="true"></div>
+      <div class="hero-shape hero-shape-2" aria-hidden="true"></div>
+
+      <div class="hero-content">
+        <div class="hero-badge">
+          <!-- Wave SVG icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
+            <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
+            <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
+          </svg>
+          À beira-mar em Itapema
+        </div>
+
+        <h1 class="hero-title">
+          <span class="line"><span class="line-inner">Mais que uma</span></span>
+          <span class="line"><span class="line-inner em">refeição,</span></span>
+          <span class="line"><span class="line-inner">uma experiência.</span></span>
+        </h1>
+
+        <p class="hero-subtitle">Frutos do mar, drinks artesanais e pratos que encantam.<br>De terça a domingo, te
+          esperando à beira-mar.</p>
+
+        <div class="hero-actions">
+          <a href="https://linktr.ee/obaobarestauranteitapema" target="_blank" rel="noopener"
+            class="btn-primary btn-large" data-magnetic>
+            <!-- Fork and knife SVG -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+              <path d="M7 2v20" />
+              <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+            </svg>
+            Faça sua Reserva
+          </a>
+          <a href="#experiencia" class="btn-ghost">
+            Conhecer mais
+          </a>
+        </div>
+      </div>
+
+      <div class="scroll-indicator" aria-label="Role para descobrir">
+        <div class="scroll-track">
+          <div class="scroll-thumb"></div>
+        </div>
+        <span>Descobrir</span>
+      </div>
+
+      <div class="hero-line" aria-hidden="true"></div>
+    </section>
+
+    <!-- Golden Marquee Strip -->
+    <div class="marquee-section" aria-hidden="true">
+      <div class="marquee-track">
+        <!-- Duplicated for seamless loop -->
+        <span class="marquee-item">Frutos do Mar<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Drinks Artesanais<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Fondue Exclusivo<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Eventos Especiais<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Sopas Caseiras<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Vista para o Mar<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Itapema, SC<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Frutos do Mar<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Drinks Artesanais<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Fondue Exclusivo<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Eventos Especiais<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Sopas Caseiras<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Vista para o Mar<span class="marquee-sep"></span></span>
+        <span class="marquee-item">Itapema, SC<span class="marquee-sep"></span></span>
+      </div>
+    </div>
+
+    <!-- About / Environment -->
+    <section class="about" id="experiencia">
+      <div class="container">
+        <div class="about-grid">
+
+          <div class="about-text">
+            <span class="s-label">Nossa Casa</span>
+            <h2 class="section-title">O <span class="highlight">Ambiente</span></h2>
+            <div class="about-divider"></div>
+            <p class="section-desc">
+              Desfrute de momentos inesquecíveis em um espaço projetado para o seu conforto e prazer.
+              Perfeito para datas especiais, eventos e aniversários, sempre com a brisa do mar como companhia.
+            </p>
+
+            <div class="info-list">
+              <div class="info-item">
+                <div class="info-icon">
+                  <!-- Location pin SVG -->
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                </div>
+                <div>
+                  <h4>Localização</h4>
+                  <p>Rua 285 N35 — Meia Praia<br>Itapema, SC</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <div class="info-icon">
+                  <!-- Clock SVG -->
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                </div>
+                <div>
+                  <h4>Horário de Funcionamento</h4>
+                  <p>Terça a Sábado: 11h às 23:30h<br>Domingo: 11h às 17h</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-images">
+            <div class="img-wrapper img-1" data-speed="0.85">
+              <img src="assets/ambiente2.jpg" alt="Ambiente externo do Oba Oba" loading="lazy">
+            </div>
+            <div class="img-wrapper img-2" data-speed="1.1">
+              <img src="assets/ambiente3.jpg" alt="Ambiente interno do Oba Oba" loading="lazy">
+            </div>
+            <!-- Floating glass badge -->
+            <div class="about-float-badge">
+              <span class="badge-num">10+</span>
+              <span class="badge-label">Anos de sabor</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Gastronomy — Custom 3D Drum Carousel -->
+    <section class="carousel-3d-section" id="gastronomia">
+      <div class="ground-glow" aria-hidden="true"></div>
+
+      <div class="carousel-3d-header container">
+        <span class="s-label">Pratos &amp; Drinks</span>
+        <h2 class="section-title">Nossa <span class="highlight">Gastronomia</span></h2>
+        <p class="section-desc">
+          Culinária de raiz com toque contemporâneo, ingredientes frescos e muito amor em cada prato.
+        </p>
+      </div>
+
+      <!-- 3D Stage -->
+      <div class="carousel-stage-wrap" id="c3d-stage">
+        <!-- Side fades -->
+        <div class="fade-left"  aria-hidden="true"></div>
+        <div class="fade-right" aria-hidden="true"></div>
+
+        <!-- Rotating drum ring -->
+        <div class="carousel-ring" id="c3d-ring">
+
+          <div class="c3d-card" data-index="0">
+            <img src="assets/foto1.jpg" alt="Prato especial" loading="lazy">
+            <div class="c3d-caption">
+              <span class="c3d-tag">Especial do Chef</span>
+              <h3 class="c3d-title">Frutos do Mar</h3>
+              <p class="c3d-desc">Ingredientes frescos do nosso litoral, preparados com maestria.</p>
+            </div>
+          </div>
+
+          <div class="c3d-card" data-index="1">
+            <img src="assets/foto3.jpg" alt="Prato da casa" loading="lazy">
+            <div class="c3d-caption">
+              <span class="c3d-tag">Clássico</span>
+              <h3 class="c3d-title">Prato da Casa</h3>
+              <p class="c3d-desc">O sabor que volta pra casa todo dia.</p>
+            </div>
+          </div>
+
+          <div class="c3d-card" data-index="2">
+            <img src="assets/drink1.jpg" alt="Drink artesanal" loading="lazy">
+            <div class="c3d-caption">
+              <span class="c3d-tag">Bar</span>
+              <h3 class="c3d-title">Drinks Artesanais</h3>
+              <p class="c3d-desc">Refrescantes, equilibrados e feitos com carinho.</p>
+            </div>
+          </div>
+
+          <div class="c3d-card" data-index="3">
+            <img src="assets/foto4.jpg" alt="Prato especial" loading="lazy">
+            <div class="c3d-caption">
+              <span class="c3d-tag">Novidade</span>
+              <h3 class="c3d-title">Criações Especiais</h3>
+              <p class="c3d-desc">Sabores únicos que surpreendem a cada visita.</p>
+            </div>
+          </div>
+
+          <div class="c3d-card" data-index="4">
+            <img src="assets/drink2.jpg" alt="Drink exclusivo" loading="lazy">
+            <div class="c3d-caption">
+              <span class="c3d-tag">Bar</span>
+              <h3 class="c3d-title">Drinks Exclusivos</h3>
+              <p class="c3d-desc">Uma carta de bebidas para todos os gostos.</p>
+            </div>
+          </div>
+
+          <div class="c3d-card" data-index="5">
+            <img src="assets/foto6.jpg" alt="Gastronomia" loading="lazy">
+            <div class="c3d-caption">
+              <span class="c3d-tag">Premium</span>
+              <h3 class="c3d-title">Alta Gastronomia</h3>
+              <p class="c3d-desc">Técnica refinada com o calor do restaurante de família.</p>
+            </div>
+          </div>
+
+          <div class="c3d-card" data-index="6">
+            <img src="assets/foto9.jpg" alt="Prato especial" loading="lazy">
+            <div class="c3d-caption">
+              <span class="c3d-tag">Favorito</span>
+              <h3 class="c3d-title">Mais Pedidos</h3>
+              <p class="c3d-desc">Os pratos que conquistaram o coração de Itapema.</p>
+            </div>
+          </div>
+
+        </div><!-- /.carousel-ring -->
+      </div><!-- /.carousel-stage-wrap -->
+
+      <!-- Controls -->
+      <div class="carousel-3d-nav" id="c3d-nav">
+        <button class="c3d-btn" id="c3d-prev" aria-label="Anterior">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
+        </button>
+
+        <div class="carousel-3d-dots" id="c3d-dots"></div>
+
+        <button class="c3d-btn" id="c3d-next" aria-label="Próximo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Drag hint -->
+      <div class="carousel-drag-hint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+        Arraste para girar
+      </div>
+    </section>
+
+    <!-- Highlights (Parallax Masonry Grid) -->
+    <section class="highlights" id="destaques">
+      <div class="container">
+        <div class="highlights-header">
+          <span class="s-label" style="justify-content:center;">O que fazemos de melhor</span>
+          <h2 class="section-title">Nossos <span class="highlight">Destaques</span></h2>
+        </div>
+
+        <div class="highlights-grid">
+
+          <div class="highlight-card h-card-1">
+            <div class="card-bg"><img src="assets/foto8.jpg" alt="Fondue especial" loading="lazy"></div>
+            <div class="card-overlay"></div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17 17 7M7 7h10v10" />
+              </svg>
+            </div>
+            <div class="card-content">
+              <span class="card-tag">Exclusivo</span>
+              <h4>Fondue</h4>
+              <p>Aqueça suas noites com nossas opções exclusivas de fondue artesanal.</p>
+            </div>
+          </div>
+
+          <div class="highlight-card h-card-2">
+            <div class="card-bg"><img src="assets/foto5.jpg" alt="Sopas caseiras" loading="lazy"></div>
+            <div class="card-overlay"></div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17 17 7M7 7h10v10" />
+              </svg>
+            </div>
+            <div class="card-content">
+              <span class="card-tag">Clássico</span>
+              <h4>Sopas</h4>
+              <p>Sabores intensos para o seu conforto.</p>
+            </div>
+          </div>
+
+          <div class="highlight-card h-card-3">
+            <div class="card-bg"><img src="assets/drink1.jpg" alt="Drinks artesanais" loading="lazy"></div>
+            <div class="card-overlay"></div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17 17 7M7 7h10v10" />
+              </svg>
+            </div>
+            <div class="card-content">
+              <span class="card-tag">Bar</span>
+              <h4>Drinks</h4>
+              <p>Refrescantes e perfeitamente equilibrados.</p>
+            </div>
+          </div>
+
+          <div class="highlight-card h-card-4">
+            <div class="card-bg"><img src="assets/evento1.jpg" alt="Eventos e aniversários" loading="lazy"></div>
+            <div class="card-overlay"></div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17 17 7M7 7h10v10" />
+              </svg>
+            </div>
+            <div class="card-content">
+              <span class="card-tag">Especial</span>
+              <h4>Eventos &amp; Aniversários</h4>
+              <p>Celebre seus momentos mais especiais conosco, com tudo que merece.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA / Footer -->
+    <footer class="footer">
+      <div class="footer-bg">
+        <img src="assets/ambiente6.jpg" alt="Vista do restaurante" loading="lazy">
+        <div class="footer-overlay"></div>
+      </div>
+      <div class="footer-glow" aria-hidden="true"></div>
+
+      <div class="container footer-content">
+        <div class="footer-cta">
+          <span class="s-label" style="justify-content:center; margin-bottom:2rem;">Reserve sua mesa</span>
+          <h2 class="footer-title">
+            Pronto para
+            <span class="em">provar?</span>
+          </h2>
+          <p>Faça seu pedido por delivery ou garanta sua mesa agora mesmo. Te esperamos!</p>
+          <div class="footer-actions">
+            <a href="https://linktr.ee/obaobarestauranteitapema" target="_blank" rel="noopener"
+              class="btn-primary btn-large" data-magnetic>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+                <path d="M7 2v20" />
+                <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+              </svg>
+              Reservar Agora
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <div class="f-logo">
+            <img src="assets/logo.jpg" alt="Oba Oba Restaurante" loading="lazy">
+          </div>
+
+          <div class="f-info">
+            <span class="f-info-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              Rua 285 N35 — Meia Praia, Itapema
+            </span>
+            <span class="f-info-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              Ter–Sáb 11h–23:30h · Dom 11h–17h
+            </span>
+          </div>
+
+          <div class="f-social">
+            <a href="https://www.instagram.com/obaobarestaurantebar" target="_blank" rel="noopener" class="social-link"
+              data-magnetic>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+              </svg>
+              Instagram
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-credits">
+          <p>&copy; 2026 Oba Oba Restaurante. Todos os direitos reservados. Desenvolvido com amor em Itapema, SC.</p>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- Lenis (Smooth Scroll) -->
+  <script src="https://unpkg.com/lenis@1.1.2/dist/lenis.min.js"></script>
+  <!-- GSAP Core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- GSAP ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <!-- Custom JS -->
+  <script src="script.js"></script>
+
+</body>
+
+</html>
