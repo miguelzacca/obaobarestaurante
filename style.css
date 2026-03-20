@@ -2077,6 +2077,11 @@ body::before {
     flex-direction: column;
     gap: 0.8rem;
   }
+
+  /* Faster marquee on mobile */
+  .marquee-track {
+    animation-duration: 12s;
+  }
 }
 
 @media (max-width: 480px) {
