@@ -372,188 +372,205 @@ gsap.from('.carousel-3d-header > *', {
 });
 
 // ─────────────────────────────────────────────────────────────
-// CUSTOM 3D DRUM CAROUSEL ENGINE
+// CUSTOM 3D DRUM CAROUSEL ENGINE  (v2 — fixed)
 // ─────────────────────────────────────────────────────────────
 (function initDrumCarousel() {
-  const ring   = document.getElementById('c3d-ring');
-  const stage  = document.getElementById('c3d-stage');
-  const cards  = Array.from(document.querySelectorAll('.c3d-card'));
+  const ring     = document.getElementById('c3d-ring');
+  const stage    = document.getElementById('c3d-stage');
   const dotsWrap = document.getElementById('c3d-dots');
   const btnPrev  = document.getElementById('c3d-prev');
   const btnNext  = document.getElementById('c3d-next');
 
-  if (!ring || !cards.length) return;
+  if (!ring) return;
+  const cards = Array.from(ring.querySelectorAll('.c3d-card'));
+  if (!cards.length) return;
 
-  const COUNT   = cards.length;
-  const ANGLE   = 360 / COUNT;           // degrees per card slot
-  const RADIUS  = 380;                   // cylinder radius (px)
+  const COUNT  = cards.length;
+  const ANGLE  = 360 / COUNT;   // degrees between card slots
+  const RADIUS = 360;           // cylinder radius px
 
-  let current   = 0;                     // active index (float during drag)
-  let targetRot = 0;                     // target rotation (degrees)
-  let currentRot = 0;                    // current animated rotation
-  let isAnimating = false;
+  // ── Source-of-truth rotation (degrees) ──────────────────────
+  // We ALWAYS read/write through this, never stale
+  let rotDeg  = 0;          // live rotation of ring
+  let current = 0;          // active card index
 
-  // ── Build dots ───────────────────────────────────────────────
-  cards.forEach((_, i) => {
-    const dot = document.createElement('button');
-    dot.className = 'c3d-dot' + (i === 0 ? ' is-active' : '');
-    dot.setAttribute('aria-label', `Slide ${i + 1}`);
-    dot.addEventListener('click', () => goTo(i));
-    dotsWrap.appendChild(dot);
+  // ── Position cards statically on cylinder ───────────────────
+  cards.forEach((card, i) => {
+    // We MUST use a raw string here because GSAP's default
+    // transform order is translate -> rotate, which ruins the cylinder.
+    // By using a string, CSS applies rotateY FIRST, then translates Z along that new angle.
+    card.style.transform = `rotateY(${i * ANGLE}deg) translateZ(${RADIUS}px)`;
   });
 
-  function getDots() { return Array.from(dotsWrap.querySelectorAll('.c3d-dot')); }
-
-  // ── Position cards on cylinder ───────────────────────────────
-  function layoutCards() {
-    cards.forEach((card, i) => {
-      const cardAngle = i * ANGLE;
-      card.style.transform = `rotateY(${cardAngle}deg) translateZ(${RADIUS}px)`;
+  // ── Build dots ──────────────────────────────────────────────
+  if (dotsWrap) {
+    cards.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'c3d-dot' + (i === 0 ? ' is-active' : '');
+      dot.setAttribute('aria-label', `Slide ${i + 1}`);
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
     });
   }
-  layoutCards();
 
-  // ── Set active class ─────────────────────────────────────────
-  function updateActive(idx) {
-    const norm = ((idx % COUNT) + COUNT) % COUNT;
-    current = norm;
-
-    cards.forEach((c, i) => c.classList.toggle('is-active', i === norm));
-    getDots().forEach((d, i) => d.classList.toggle('is-active', i === norm));
+  // ── Update active state ──────────────────────────────────────
+  function setActive(idx) {
+    idx = ((idx % COUNT) + COUNT) % COUNT;
+    current = idx;
+    cards.forEach((c, i) => c.classList.toggle('is-active', i === idx));
+    if (dotsWrap) {
+      Array.from(dotsWrap.querySelectorAll('.c3d-dot'))
+        .forEach((d, i) => d.classList.toggle('is-active', i === idx));
+    }
   }
-  updateActive(0);
+  setActive(0);
 
-  // ── Core rotation function (GSAP) ────────────────────────────
-  function goTo(idx, instant = false) {
-    const norm = ((idx % COUNT) + COUNT) % COUNT;
+  // ── Go to card (GSAP animate ring) ──────────────────────────
+  function goTo(idx) {
+    idx = ((idx % COUNT) + COUNT) % COUNT;
 
-    // Find shortest rotation path
-    let delta = norm - current;
+    // Shortest-path delta
+    let delta = idx - current;
     if (delta >  COUNT / 2) delta -= COUNT;
     if (delta < -COUNT / 2) delta += COUNT;
 
-    targetRot -= delta * ANGLE;
-
-    if (instant) {
-      currentRot = targetRot;
-      gsap.set(ring, { rotateY: currentRot });
-      updateActive(norm);
-      return;
-    }
+    const targetDeg = rotDeg - delta * ANGLE;
 
     gsap.killTweensOf(ring);
     gsap.to(ring, {
-      rotateY: targetRot,
-      duration: 1.1,
-      ease: 'power4.out',
-      onUpdate: function() {
-        const rot = gsap.getProperty(ring, 'rotateY');
-        const idx = Math.round(-rot / ANGLE);
-        updateActive(idx);
+      rotateY: targetDeg,
+      duration: 0.95,
+      ease: 'power3.out',
+      force3D: true,
+      onUpdate() {
+        rotDeg = gsap.getProperty(ring, 'rotateY');
+        const liveIdx = Math.round(-rotDeg / ANGLE);
+        setActive(((liveIdx % COUNT) + COUNT) % COUNT);
       },
-      onComplete: () => {
-        currentRot = targetRot;
-        updateActive(norm);
+      onComplete() {
+        rotDeg = targetDeg;
+        setActive(idx);
       },
     });
   }
 
-  // ── Button navigation ────────────────────────────────────────
-  btnPrev && btnPrev.addEventListener('click', () => {
-    goTo(current - 1);
-  });
-  btnNext && btnNext.addEventListener('click', () => {
-    goTo(current + 1);
-  });
+  // ── Button nav ───────────────────────────────────────────────
+  btnPrev?.addEventListener('click', () => goTo(current - 1));
+  btnNext?.addEventListener('click', () => goTo(current + 1));
 
-  // ── Keyboard navigation ──────────────────────────────────────
+  // ── Keyboard nav ─────────────────────────────────────────────
   document.addEventListener('keydown', (e) => {
-    if (!isInView()) return;
-    if (e.key === 'ArrowLeft')  goTo(current - 1);
-    if (e.key === 'ArrowRight') goTo(current + 1);
+    if (!stage) return;
+    const r = stage.getBoundingClientRect();
+    if (r.top > window.innerHeight || r.bottom < 0) return;
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(current - 1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
   });
 
-  function isInView() {
-    const rect = stage.getBoundingClientRect();
-    return rect.top < window.innerHeight && rect.bottom > 0;
+  // ── Drag / swipe ─────────────────────────────────────────────
+  let dragStartX  = null;
+  let dragStartRot = 0;
+
+  function dragStart(x) {
+    dragStartX   = x;
+    dragStartRot = gsap.getProperty(ring, 'rotateY'); // read live value
+    gsap.killTweensOf(ring);
   }
 
-  // ── Drag / swipe with inertia ─────────────────────────────────
-  let dragStart = null;
-  let dragRot   = 0;
-  let lastDelta = 0;
-  let velocity  = 0;
-  let rafInertia;
+  function dragMove(x) {
+    if (dragStartX === null) return;
+    const dx     = x - dragStartX;
+    const newRot = dragStartRot + dx * 0.28;
+    rotDeg       = newRot;
+    gsap.set(ring, { rotateY: newRot, force3D: true });
+    const liveIdx = Math.round(-newRot / ANGLE);
+    setActive(((liveIdx % COUNT) + COUNT) % COUNT);
+  }
 
-  const onDragStart = (x) => {
-    dragStart = x;
-    dragRot   = currentRot;
-    velocity  = 0;
-    cancelAnimationFrame(rafInertia);
+  function dragEnd(x) {
+    if (dragStartX === null) return;
+    const dx = x - dragStartX;
+    dragStartX = null;
+
+    // Snap to nearest card with a little inertia
+    const inertiaRot = rotDeg + dx * 0.15;
+    const snapIdx    = -Math.round(inertiaRot / ANGLE);
+    const normIdx    = ((snapIdx % COUNT) + COUNT) % COUNT;
+
+    // Animate to snap position
+    const snapDeg = -snapIdx * ANGLE;
     gsap.killTweensOf(ring);
-  };
+    gsap.to(ring, {
+      rotateY: snapDeg,
+      duration: 0.7,
+      ease: 'power3.out',
+      force3D: true,
+      onComplete() {
+        rotDeg = snapDeg;
+        setActive(normIdx);
+      },
+    });
+  }
 
-  const onDragMove = (x) => {
-    if (dragStart === null) return;
-    const dx = x - dragStart;
-    lastDelta = dx;
-    const newRot = dragRot + dx * 0.25;
-    gsap.set(ring, { rotateY: newRot });
-    // Update visual active on drag
-    const activeIdx = Math.round(-newRot / ANGLE);
-    updateActive(activeIdx);
-  };
+  // Mouse events
+  stage.addEventListener('mousedown',  (e) => { e.preventDefault(); dragStart(e.clientX); });
+  window.addEventListener('mousemove', (e) => dragMove(e.clientX));
+  window.addEventListener('mouseup',   (e) => dragEnd(e.clientX));
 
-  const onDragEnd = (x) => {
-    if (dragStart === null) return;
-    const dx   = x - dragStart;
-    velocity   = dx * 0.15;            // initial inertia velocity
-    dragStart  = null;
+  // Touch events — passive:false so we can prevent scroll while swiping carousel
+  stage.addEventListener('touchstart', (e) => {
+    dragStart(e.touches[0].clientX);
+  }, { passive: true });
 
-    // Inertia coast
-    const coastAngle = currentRot + velocity * 6;
-    const snapIdx    = -Math.round(coastAngle / ANGLE);
-    goTo(((snapIdx % COUNT) + COUNT) % COUNT);
+  stage.addEventListener('touchmove', (e) => {
+    if (dragStartX === null) return;
+    e.stopPropagation();       // stop lenis from stealing it
+    dragMove(e.touches[0].clientX);
+  }, { passive: true });
 
-    currentRot = gsap.getProperty(ring, 'rotateY');
-  };
-
-  // Mouse
-  stage.addEventListener('mousedown', (e) => onDragStart(e.clientX));
-  window.addEventListener('mousemove', (e) => { if (dragStart !== null) onDragMove(e.clientX); });
-  window.addEventListener('mouseup',   (e) => onDragEnd(e.clientX));
-
-  // Touch
-  stage.addEventListener('touchstart', (e) => onDragStart(e.touches[0].clientX), { passive: true });
-  stage.addEventListener('touchmove',  (e) => onDragMove(e.touches[0].clientX),  { passive: true });
-  stage.addEventListener('touchend',   (e) => onDragEnd(e.changedTouches[0].clientX));
+  stage.addEventListener('touchend', (e) => {
+    dragEnd(e.changedTouches[0].clientX);
+  }, { passive: true });
 
   // ── Autoplay ─────────────────────────────────────────────────
-  let autoId = setInterval(() => {
-    if (document.hidden || dragStart !== null) return;
-    goTo(current + 1);
-  }, 4000);
+  let autoTimer = null;
 
-  stage.addEventListener('mouseenter', () => clearInterval(autoId));
-  stage.addEventListener('mouseleave', () => {
-    autoId = setInterval(() => goTo(current + 1), 4000);
-  });
+  function startAuto() {
+    stopAuto();
+    autoTimer = setInterval(() => {
+      if (!document.hidden && dragStartX === null) goTo(current + 1);
+    }, 4200);
+  }
 
-  // ── Scroll reveal of entire section ──────────────────────────
-  gsap.from(ring, {
-    opacity: 0,
-    scale: 0.85,
-    duration: 1.2,
-    ease: 'power4.out',
-    scrollTrigger: {
-      trigger: '.carousel-3d-section',
-      start: 'top 80%',
-    },
-  });
+  function stopAuto() {
+    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  }
+
+  startAuto();
+  stage.addEventListener('mouseenter', stopAuto);
+  stage.addEventListener('mouseleave', startAuto);
+  stage.addEventListener('touchstart',  stopAuto, { passive: true });
+  stage.addEventListener('touchend',    () => setTimeout(startAuto, 2000), { passive: true });
+
+  // ── Scroll-triggered reveal (opacity only — preserve-3d safe) ──
+  gsap.fromTo(stage,
+    { opacity: 0 },
+    {
+      opacity: 1,
+      duration: 1.2,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '.carousel-3d-section', start: 'top 82%' },
+    }
+  );
 
   gsap.from('.carousel-3d-nav', {
     y: 30, opacity: 0, duration: 0.9, ease: 'power3.out',
-    scrollTrigger: { trigger: '.carousel-3d-section', start: 'top 75%' },
+    scrollTrigger: { trigger: '.carousel-3d-section', start: 'top 76%' },
+  });
+
+  gsap.from('.carousel-drag-hint', {
+    y: 10, opacity: 0, duration: 0.7, ease: 'power2.out', delay: 0.3,
+    scrollTrigger: { trigger: '.carousel-3d-section', start: 'top 76%' },
   });
 })();
 

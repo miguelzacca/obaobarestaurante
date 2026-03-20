@@ -514,7 +514,7 @@ body::before {
   border-radius: 50%;
   border: 1px solid transparent;
   background: conic-gradient(var(--gold) 0deg, transparent 120deg, transparent 360deg) border-box;
-  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
   mask-composite: exclude;
   animation: ring-spin 3s linear infinite;
@@ -1235,7 +1235,7 @@ body::before {
   height: 370px;
   transform-style: preserve-3d;
   will-change: transform;
-  transition: transform 0.05s linear;
+  /* NO transition here — GSAP controls this */
 }
 
 /* ── Card face ──────────────────────────── */
