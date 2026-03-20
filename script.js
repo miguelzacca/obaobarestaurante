@@ -387,7 +387,11 @@ gsap.from('.carousel-3d-header > *', {
 
   const COUNT  = cards.length;
   const ANGLE  = 360 / COUNT;   // degrees between card slots
-  const RADIUS = 360;           // cylinder radius px
+
+  // Calculate radius based on screen size
+  function getRadius() {
+    return window.innerWidth <= 768 ? 240 : 360;
+  }
 
   // ── Source-of-truth rotation (degrees) ──────────────────────
   // We ALWAYS read/write through this, never stale
@@ -395,12 +399,19 @@ gsap.from('.carousel-3d-header > *', {
   let current = 0;          // active card index
 
   // ── Position cards statically on cylinder ───────────────────
-  cards.forEach((card, i) => {
-    // We MUST use a raw string here because GSAP's default
-    // transform order is translate -> rotate, which ruins the cylinder.
-    // By using a string, CSS applies rotateY FIRST, then translates Z along that new angle.
-    card.style.transform = `rotateY(${i * ANGLE}deg) translateZ(${RADIUS}px)`;
-  });
+  function layoutCards() {
+    const radius = getRadius();
+    cards.forEach((card, i) => {
+      // We MUST use a raw string here because GSAP's default
+      // transform order is translate -> rotate, which ruins the cylinder.
+      // By using a string, CSS applies rotateY FIRST, then translates Z along that new angle.
+      card.style.transform = `rotateY(${i * ANGLE}deg) translateZ(${radius}px)`;
+    });
+  }
+  layoutCards();
+
+  // Re-layout on resize
+  window.addEventListener('resize', () => layoutCards());
 
   // ── Build dots ──────────────────────────────────────────────
   if (dotsWrap) {

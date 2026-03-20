@@ -1478,22 +1478,22 @@ body::before {
 /* ── Responsive ─────────────────────────── */
 @media (max-width: 768px) {
   .carousel-stage-wrap {
-    height: 440px;
-    perspective: 900px;
+    height: 340px;
+    perspective: 800px;
   }
 
   .carousel-ring {
-    width: 260px;
-    height: 380px;
+    width: 200px;
+    height: 280px;
   }
 
   .c3d-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   .carousel-stage-wrap .fade-left,
   .carousel-stage-wrap .fade-right {
-    width: 70px;
+    width: 40px;
   }
 }
 
